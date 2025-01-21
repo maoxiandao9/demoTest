@@ -1,7 +1,5 @@
 package mutiThreadDemos.ThreadDemo;
 
-import com.sun.xml.internal.ws.addressing.WsaActionUtil;
-
 import java.util.concurrent.*;
 
 public class Main {
@@ -33,28 +31,5 @@ public class Main {
         }
         executor.shutdown();
         System.out.println("end!!!");
-    }
-}
-
-class MyThread extends Thread {
-    @Override
-    public void run() {
-        System.out.println("MyThread method 1 started");
-    }
-}
-
-class MyRunnable implements Runnable {
-    @Override
-    public void run() {
-        System.out.println("MyRunnable method 2 started" + Thread.currentThread().getName());
-    }
-}
-
-class MyCallable implements Callable<Integer> {
-    @Override
-    public Integer call() throws Exception {
-//        Thread.sleep(10000);
-        System.out.println("MyCallable method 3 started");
-        return 1;
     }
 }
