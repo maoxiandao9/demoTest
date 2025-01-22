@@ -1,4 +1,4 @@
-package mutiThreadDemos.ThreadDemo;
+package mutiThreadDemos.threadDemo;
 
 import java.util.concurrent.*;
 
