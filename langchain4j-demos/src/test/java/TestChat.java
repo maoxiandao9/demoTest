@@ -1,6 +1,9 @@
 import dev.langchain4j.community.model.dashscope.WanxImageModel;
 import dev.langchain4j.data.image.Image;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
@@ -25,6 +28,16 @@ public class TestChat {
         String answer = model.chat("你好， 你是谁?");
 
         System.out.println(answer);
+
+        UserMessage userMessage = UserMessage.userMessage("你好，我是amumu");
+        ChatResponse response = model.chat(userMessage);
+        AiMessage aiMessage = response.aiMessage();
+        System.out.println(aiMessage.text());
+        System.out.println("--------");
+
+        ChatResponse response1 = model.chat(userMessage, aiMessage, UserMessage.userMessage("我是谁？"));
+        AiMessage aiMessage1 = response1.aiMessage();
+        System.out.println(aiMessage1.text());
     }
 
     /**

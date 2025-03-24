@@ -5,6 +5,8 @@ import dev.langchain4j.community.model.dashscope.QwenStreamingChatModel;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.chat.response.StreamingChatResponseHandler;
+import dev.langchain4j.service.TokenStream;
+import org.example.langchain4jspringboot.config.AiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,6 +25,9 @@ public class ChatController {
 
     @Autowired
     QwenStreamingChatModel qwenStreamingChatModel;
+
+    @Autowired
+    AiConfig.Assiatant assiatant;
 
     @RequestMapping("/chat")
     public String test(@RequestParam(defaultValue = "你好") String message) {
@@ -58,5 +63,22 @@ public class ChatController {
             });
         });
         return flux;
+    }
+
+    @RequestMapping(value = "/memory_chat")
+    public String memoryChat(@RequestParam(defaultValue = "我是amumu") String message) {
+        return assiatant.chat(message);
+    }
+
+    @RequestMapping(value = "/memory_stream_chat", produces = "text/stream;charset=UTF-8")
+    public Flux<String> memoryStreamChat(@RequestParam(defaultValue = "我是谁")String message) {
+        TokenStream stream = assiatant.stream(message);
+
+        return Flux.create(sink -> {
+            stream.onPartialResponse(s -> sink.next(s))
+                    .onCompleteResponse(s -> sink.complete())
+                    .onError(sink::error)
+                    .start();
+        });
     }
 }
