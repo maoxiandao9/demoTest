@@ -6,10 +6,8 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.MemoryId;
-import dev.langchain4j.service.TokenStream;
-import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.*;
+import org.example.langchain4jspringboot.service.ToolsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,15 +20,26 @@ public class AiConfig {
         String chat(String message);
         // 流式响应
         TokenStream stream(String message);
+
+        @SystemMessage("""
+                您是“Tuling”航空公司的客户聊天支持代理。请以友好、乐于助人且愉快的方式来回复。
+                您正在通过在线聊天系统与客户互动。
+                在提供有关预订或取消预订的信息之前，您必须始终从用户处获取以下信息：预订号、客户姓名。
+                请讲中文。
+                今天的日期是 {{current_date}}.
+                """)
+        TokenStream stream(@UserMessage String message, @V("current_date") String currentDate);
     }
 
     @Bean
     public Assiatant assiant(ChatLanguageModel chatLanguageModel,
-                             StreamingChatLanguageModel qwenStreamingChatModel, QwenChatModel qwenChatModel) {
+                             StreamingChatLanguageModel qwenStreamingChatModel, QwenChatModel qwenChatModel,
+                             ToolsService toolsService) {
         ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
 
         // 为Assistant创建动态代理对象 chat -> 对话内容存储ChatMemory -> 聊天记录ChatMemory取出来 -> 放入到当前对话中
         Assiatant assiatant = AiServices.builder(Assiatant.class)
+                .tools(toolsService)
                 .chatLanguageModel(qwenChatModel)
                 .streamingChatLanguageModel(qwenStreamingChatModel)
                 .chatMemory(chatMemory)

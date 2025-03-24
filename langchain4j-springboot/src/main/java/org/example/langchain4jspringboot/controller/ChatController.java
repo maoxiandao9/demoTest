@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/ai")
 public class ChatController {
@@ -90,9 +92,9 @@ public class ChatController {
         return assiantUnique.chat(userId, message);
     }
 
-    @RequestMapping(value = "/memory_stream_chat", produces = "text/stream;charset=UTF-8")
-    public Flux<String> memoryIdStreamChat(@RequestParam(defaultValue = "我是谁")String message, Integer userId) {
-        TokenStream stream = assiantUnique.stream(userId, message);
+    @RequestMapping(value = "/memory_stream_call_chat", produces = "text/stream;charset=UTF-8")
+    public Flux<String> memoryIdStreamChat(@RequestParam(defaultValue = "我是谁")String message) {
+        TokenStream stream = assiatant.stream(message, LocalDate.now().toString());
 
         return Flux.create(sink -> {
             stream.onPartialResponse(s -> sink.next(s))
