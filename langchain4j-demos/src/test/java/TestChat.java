@@ -1,8 +1,13 @@
+import dev.langchain4j.community.model.dashscope.WanxImageModel;
+import dev.langchain4j.data.image.Image;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.community.model.dashscope.QwenChatModel;
+import dev.langchain4j.model.output.Response;
 import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
 
 public class TestChat {
 
@@ -10,7 +15,7 @@ public class TestChat {
      * 测试基本对话，openai
      */
     @Test
-    void test() {
+    void test01() {
         ChatLanguageModel model = OpenAiChatModel
                 .builder()
                 .apiKey("demo")
@@ -73,6 +78,22 @@ public class TestChat {
         String answer = model.chat("你好， 你是谁?");
 
         System.out.println(answer);
+    }
+
+    /**
+     * 文生图
+     */
+    @Test
+    void test() {
+        WanxImageModel wanxImageModel = WanxImageModel
+                .builder()
+                .apiKey(System.getenv("ALI_API_KEY"))
+                .modelName("wanx2.1-t2i-plus")
+                .build();
+
+        Response<Image> response = wanxImageModel.generate("校园");
+
+        System.out.println(response.content().url());
     }
 }
 //sk-8bf0cce26e944f6fb41b02c0708a8d3d
