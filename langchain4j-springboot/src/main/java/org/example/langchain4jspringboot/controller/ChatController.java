@@ -29,6 +29,9 @@ public class ChatController {
     @Autowired
     AiConfig.Assiatant assiatant;
 
+    @Autowired
+    AiConfig.AssiatantUnique assiantUnique;
+
     @RequestMapping("/chat")
     public String test(@RequestParam(defaultValue = "你好") String message) {
         String chat = qwenChatModel.chat(message);
@@ -73,6 +76,23 @@ public class ChatController {
     @RequestMapping(value = "/memory_stream_chat", produces = "text/stream;charset=UTF-8")
     public Flux<String> memoryStreamChat(@RequestParam(defaultValue = "我是谁")String message) {
         TokenStream stream = assiatant.stream(message);
+
+        return Flux.create(sink -> {
+            stream.onPartialResponse(s -> sink.next(s))
+                    .onCompleteResponse(s -> sink.complete())
+                    .onError(sink::error)
+                    .start();
+        });
+    }
+
+    @RequestMapping(value = "/memoryId_chat")
+    public String memoryIdChat(@RequestParam(defaultValue = "我是amumu") String message, Integer userId) {
+        return assiantUnique.chat(userId, message);
+    }
+
+    @RequestMapping(value = "/memory_stream_chat", produces = "text/stream;charset=UTF-8")
+    public Flux<String> memoryIdStreamChat(@RequestParam(defaultValue = "我是谁")String message, Integer userId) {
+        TokenStream stream = assiantUnique.stream(userId, message);
 
         return Flux.create(sink -> {
             stream.onPartialResponse(s -> sink.next(s))
